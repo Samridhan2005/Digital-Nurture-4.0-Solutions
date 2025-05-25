@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Community Event Portal - JS Module</title>
+</head>
+<body>
+    <header>
+        <h1>Local Community Event Portal</h1>
+    </header>
+    <main>
+        <section id="events">
+            <h2>Upcoming Events</h2>
+            <div id="eventList"></div>
+        </section>
+        <section id="register">
+            <h2>Register for an Event</h2>
+            <form id="registrationForm">
+                <input type="text" name="name" placeholder="Your Name" required />
+                <input type="email" name="email" placeholder="Your Email" required />
+                <select name="eventSelect" required>
+                    <option value="">Select Event</option>
+                    <option value="music">Music Night</option>
+                    <option value="sports">Sports Day</option>
+                </select>
+                <button type="submit" id="registerBtn">Register</button>
+            </form>
+            <div id="formMessage"></div>
+        </section>
+    </main>
+    <script src="main.js"></script>
+</body>
+</html>

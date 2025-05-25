@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Community Event Portal</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Event Registration Form JS
+        function showConfirmation(e) {
+            e.preventDefault();
+            document.getElementById('outputMsg').value = 'Thank you for registering!';
+            document.getElementById('outputMsg').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('outputMsg').style.display = 'none';
+            }, 2500);
+        }
+        // Phone validation on blur
+        function validatePhone(el) {
+            const val = el.value;
+            if (!/^\d{10}$/.test(val)) {
+                el.style.border = '2px solid #e53935';
+                el.style.background = '#ffebee';
+                alert('Please enter a valid 10-digit phone number.');
+                el.focus();
+            } else {
+                el.style.border = '';
+                el.style.background = '';
+            }
+        }
+        // Show event fee on change
+        function showFee(sel) {
+            const fees = { 'music': '$10', 'sports': '$5', 'workshop': '$15' };
+            document.getElementById('eventFee').textContent = 'Fee: ' + (fees[sel.value] || 'N/A');
+            // Save preference
+            localStorage.setItem('preferredEvent', sel.value);
+        }
+        // Pre-select event type from localStorage
+        window.onload = function() {
+            const pref = localStorage.getItem('preferredEvent');
+            if (pref) {
+                document.getElementById('eventType').value = pref;
+                showFee(document.getElementById('eventType'));
+            }
+            // Animate gallery images
+            document.querySelectorAll('.gallery-img').forEach(img => {
+                img.addEventListener('mouseover', () => img.style.transform = 'scale(1.12) rotate(-2deg)');
+                img.addEventListener('mouseout', () => img.style.transform = '');
+            });
+        };
+        // Clear preferences
+        function clearPrefs() {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Preferences cleared!');
+            location.reload();
+        }
+        // Enlarge image on double click
+        function enlargeImg(img) {
+            img.classList.toggle('enlarged');
+        }
+        // Character count in feedback
+        function countChars(el) {
+            document.getElementById('charCount').textContent = el.value.length + ' chars';
+            if (el.value.length > 200) {
+                el.style.background = '#ffebee';
+            } else {
+                el.style.background = '';
+            }
+        }
+        // Video ready event
+        function videoReady() {
+            document.getElementById('videoMsg').textContent = 'Video ready to play';
+            setTimeout(() => {
+                document.getElementById('videoMsg').textContent = '';
+            }, 2000);
+        }
+        // Geolocation
+        function findNearby() {
+            if (!navigator.geolocation) {
+                document.getElementById('geoResult').textContent = 'Geolocation not supported.';
+                return;
+            }
+            document.getElementById('geoResult').textContent = 'Locating...';
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    document.getElementById('geoResult').textContent = 'Your coordinates: ' + pos.coords.latitude + ', ' + pos.coords.longitude;
+                },
+                function(err) {
+                    document.getElementById('geoResult').textContent = 'Error: ' + err.message;
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            );
+        }
+        // Warn on leaving unfinished form
+        window.onbeforeunload = function(e) {
+            if (document.getElementById('name').value || document.getElementById('email').value) {
+                return 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        };
+        // Add interactivity: highlight nav on scroll
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 40) {
+                nav.style.boxShadow = '0 4px 16px rgba(33,150,243,0.18)';
+            } else {
+                nav.style.boxShadow = '';
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#events">Events</a>
+        <a href="#contact">Contact</a>
+        <a href="help.html" target="_blank">Help</a>
+    </nav>
+
+    <!-- Main -->
+    <main>
+        <!-- Welcome Banner -->
+        <div id="welcomeBanner">
+            Welcome, <span class="highlight">Community Member!</span>
+            <span style="color:red; font-weight:bold;"> Special Offer: Free entry for first 50!</span>
+        </div>
+
+        <!-- Home Section -->
+        <section id="home">
+            <h2>Welcome to the Local Community Event Portal</h2>
+            <p class="highlight">Stay updated with the latest events and services in your city.</p>
+        </section>
+
+        <!-- Events Section -->
+        <section id="events">
+            <h2>Upcoming & Past Events</h2>
+            <!-- Image Gallery -->
+            <table class="gallery">
+                <caption>Past Community Events</caption>
+                <tr>
+                    <td><img src="https://picsum.photos/id/1011/200/120" alt="Music Night" title="Music Night" class="gallery-img" ondblclick="enlargeImg(this)"></td>
+                    <td><img src="https://picsum.photos/id/1015/200/120" alt="Sports Day" title="Sports Day" class="gallery-img" ondblclick="enlargeImg(this)"></td>
+                    <td><img src="https://picsum.photos/id/1025/200/120" alt="Art Workshop" title="Art Workshop" class="gallery-img" ondblclick="enlargeImg(this)"></td>
+                </tr>
+                <tr>
+                    <td><img src="https://picsum.photos/id/1035/200/120" alt="Food Fest" title="Food Fest" class="gallery-img" ondblclick="enlargeImg(this)"></td>
+                    <td><img src="https://picsum.photos/id/1041/200/120" alt="Book Fair" title="Book Fair" class="gallery-img" ondblclick="enlargeImg(this)"></td>
+                    <td><img src="https://picsum.photos/id/1050/200/120" alt="Charity Run" title="Charity Run" class="gallery-img" ondblclick="enlargeImg(this)"></td>
+                </tr>
+            </table>
+
+            <!-- Event Registration Form -->
+            <form id="regForm" onsubmit="showConfirmation(event)">
+                <h3>Register for an Event</h3>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="Your Name" required autofocus>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="you@email.com" required>
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone" name="phone" placeholder="10-digit number" onblur="validatePhone(this)">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+                <label for="eventType">Event Type:</label>
+                <select id="eventType" name="eventType" onchange="showFee(this)">
+                    <option value="">Select</option>
+                    <option value="music">Music Night</option>
+                    <option value="sports">Sports Day</option>
+                    <option value="workshop">Workshop</option>
+                </select>
+                <span id="eventFee" class="highlight"></span>
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" placeholder="Your message" onkeyup="countChars(this)"></textarea>
+                <span id="charCount">0 chars</span>
+                <button type="submit" onclick="showConfirmation(event)">Submit</button>
+                <output id="outputMsg"></output>
+            </form>
+            <button onclick="clearPrefs()">Clear Preferences</button>
+
+            <!-- Geolocation -->
+            <h3>Find Events Near You</h3>
+            <button onclick="findNearby()">Find Nearby Events</button>
+            <div id="geoResult"></div>
+        </section>
+
+        <!-- Video Invite -->
+        <section id="videoInvite">
+            <h2>Event Promo Video</h2>
+            <video width="400" height="225" controls poster="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" oncanplay="videoReady()">
+                <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                <source src="https://www.w3schools.com/html/movie.ogg" type="video/ogg">
+                Your browser does not support the video tag.
+            </video>
+            <div id="videoMsg"></div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact">
+            <h2>Contact Us</h2>
+            <p>Email: <a href="mailto:info@cityevents.com">samridhans</a></p>
+            <p>Phone: 123-456-7890</p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Local City Council. All rights reserved.</p>
+        <!-- Debugging Instructions -->
+        <!--
+        Debugging Tips:
+        - Right-click and choose "Inspect" to open Chrome DevTools.
+        - Use the Elements tab to modify styles live.
+        - Use the Console tab to view logs and errors.
+        - Set breakpoints in the Sources tab to debug JS.
+        - Reload the page to watch variable values.
+        -->
+    </footer>
+</body>
+</html>
